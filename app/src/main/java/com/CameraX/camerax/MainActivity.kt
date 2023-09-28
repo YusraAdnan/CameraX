@@ -64,17 +64,19 @@ class MainActivity : AppCompatActivity() {
             format(System
                 .currentTimeMillis()) + ".jpg") //saves captured photo to directory
 
+        //picture saved in jpg format
             val outputOption = ImageCapture
                 .OutputFileOptions
                 .Builder(photoFile)
                 .build()
+
         imageCapture.takePicture(
             outputOption, ContextCompat.getMainExecutor(this),
             object: ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-
+                    //saves captured picture in the file directory
                     val savedUri = Uri.fromFile(photoFile)
-                    val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
+                    val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath) //decodes image file specified by photofile and converts to bitmap
                     binding.imageview.setImageBitmap(bitmap)
                     val msg = "Photo Saved"
                     Toast.makeText(this@MainActivity,

@@ -3,6 +3,7 @@ package com.CameraX.camerax
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.Image
 import android.net.Uri
@@ -20,6 +21,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.CameraX.camerax.databinding.ActivityMainBinding
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -29,12 +31,18 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding:ActivityMainBinding
     private  var imageCapture: ImageCapture?=null
     private lateinit var outputDirectory: File
+    private var bitmap:Bitmap? = null
+    var filepath:String? = null
+
+    companion object {
+        var byteArray: ByteArray? = null
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate((layoutInflater))
         setContentView(binding.root)
 
-        outputDirectory = getOutputDirectory() //gets file directory where all captred photos are stored
+        outputDirectory = getOutputDirectory() //gets file directory where all captured photos are stored
         if(allPermissionGranted()){
            startCamera()
         }else{
@@ -46,6 +54,13 @@ class MainActivity : AppCompatActivity() {
         binding.btnTakePhoto.setOnClickListener{
             takePhoto()
         }
+        val intent = Intent(this, PDFActivity::class.java)
+
+         binding.BtnCnvertPdf.setOnClickListener {
+
+            intent.putExtra("FilePath", filepath)//getting file path of taken picture from ImageCapture sending it to PDFActivity
+            startActivity(intent)
+         }
     }
     private fun getOutputDirectory(): File{
         val mediaDir = externalMediaDirs.firstOrNull()?.let { mFile ->
@@ -72,12 +87,21 @@ class MainActivity : AppCompatActivity() {
 
         imageCapture.takePicture(
             outputOption, ContextCompat.getMainExecutor(this),
-            object: ImageCapture.OnImageSavedCallback {
+             object: ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
                     //saves captured picture in the file directory
                     val savedUri = Uri.fromFile(photoFile)
-                    val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath) //decodes image file specified by photofile and converts to bitmap
+                    filepath = photoFile.absolutePath// this is used to send the file path to the next activity as the bitmap cannot be sent through intent
+                    bitmap = BitmapFactory.decodeFile(photoFile.absolutePath) //decodes image file specified by photofile and converts to bitmap
                     binding.imageview.setImageBitmap(bitmap)
+
+                     byteArray = bitmap?.let {
+                        val stream = ByteArrayOutputStream()
+                        it.compress(Bitmap.CompressFormat.PNG, 100, stream)
+                        stream.toByteArray()
+                    } ?: byteArrayOf()
+
+
                     val msg = "Photo Saved"
                     Toast.makeText(this@MainActivity,
                     "$msg $savedUri",
@@ -91,7 +115,6 @@ class MainActivity : AppCompatActivity() {
 
                     contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
                 }
-
                 override fun onError(exception: ImageCaptureException) {
                    Log.e(Constants.TAG,
                    "onError: ${exception.message}", exception)

@@ -1,13 +1,12 @@
-package com.CameraX.camerax
+package com.CameraX.camerax.Activity
 
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.media.Image
 import android.net.Uri
-import android.nfc.Tag
+
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
@@ -20,11 +19,14 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.CameraX.camerax.Constants
+import com.CameraX.camerax.R
 import com.CameraX.camerax.databinding.ActivityMainBinding
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -33,6 +35,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var outputDirectory: File
     private var bitmap:Bitmap? = null
     var filepath:String? = null
+
+
 
     companion object {
         var byteArray: ByteArray? = null
@@ -74,7 +78,8 @@ class MainActivity : AppCompatActivity() {
     private fun takePhoto(){
         val imageCapture =imageCapture?: return
         val photoFile = File(
-            outputDirectory, SimpleDateFormat(Constants.FILE_NAME_FORMAT,
+            outputDirectory, SimpleDateFormat(
+                Constants.FILE_NAME_FORMAT,
             Locale.getDefault()).
             format(System
                 .currentTimeMillis()) + ".jpg") //saves captured photo to directory
@@ -116,7 +121,8 @@ class MainActivity : AppCompatActivity() {
                     contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
                 }
                 override fun onError(exception: ImageCaptureException) {
-                   Log.e(Constants.TAG,
+                   Log.e(
+                       Constants.TAG,
                    "onError: ${exception.message}", exception)
                 }
             }

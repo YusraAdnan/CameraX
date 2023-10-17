@@ -36,8 +36,6 @@ class MainActivity : AppCompatActivity() {
     private var bitmap:Bitmap? = null
     var filepath:String? = null
 
-
-
     companion object {
         var byteArray: ByteArray? = null
     }
@@ -99,13 +97,6 @@ class MainActivity : AppCompatActivity() {
                     filepath = photoFile.absolutePath// this is used to send the file path to the next activity as the bitmap cannot be sent through intent
                     bitmap = BitmapFactory.decodeFile(photoFile.absolutePath) //decodes image file specified by photofile and converts to bitmap
                     binding.imageview.setImageBitmap(bitmap)
-
-                     byteArray = bitmap?.let {
-                        val stream = ByteArrayOutputStream()
-                        it.compress(Bitmap.CompressFormat.PNG, 100, stream)
-                        stream.toByteArray()
-                    } ?: byteArrayOf()
-
 
                     val msg = "Photo Saved"
                     Toast.makeText(this@MainActivity,

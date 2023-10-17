@@ -46,7 +46,8 @@ class PDFActivity : AppCompatActivity() {
             imageView?.setImageBitmap(bitmap)
             bitmap?.let {
                 scaledbmp = Bitmap.createScaledBitmap(it, 140, 140, false)
-            }        }
+            }
+        }
         generatePDFBtn = findViewById(R.id.idBtnGeneratePdf)
         if (checkPermissions()) {
             // if permission is granted we are displaying a toast message.

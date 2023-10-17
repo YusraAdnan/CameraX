@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <uses-permission android:name="android.hardware.camera.any" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -14,13 +15,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CameraX">
         <activity
-            android:name=".Activity.MainActivity"
+            android:name=".Activity.PostBitmapActivity"
             android:exported="false" />
         <activity
             android:name=".Activity.PDFActivity"
             android:exported="false" />
         <activity
-            android:name=".Activity.PostBitmapActivity"
+            android:name=".Activity.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

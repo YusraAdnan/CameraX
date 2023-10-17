@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.ImageView
 import java.io.ByteArrayOutputStream
 import android.widget.TextView
+import android.widget.Toast
 import com.CameraX.camerax.Client.ApiClient
 import com.CameraX.camerax.Model.ApiResponse
 import com.CameraX.camerax.Model.ImageRequest
@@ -16,6 +17,9 @@ import com.CameraX.camerax.R
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.android.schedulers.AndroidSchedulers
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 
 class PostBitmapActivity : AppCompatActivity() {
     private lateinit var imageView: ImageView
@@ -41,28 +45,30 @@ class PostBitmapActivity : AppCompatActivity() {
     }
 
     fun sendImage(bitmap: Bitmap) {
+
         val byteArrayOutputStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+        val byteArray = byteArrayOutputStream.toByteArray()
+
+        //https://www.youtube.com/watch?v=aY9xsGMlC5c
+        val requestFile = RequestBody.create(MediaType.parse("image/jpeg"),byteArray)//request body showing data in binary format
+        val body = MultipartBody.Part.createFormData("image","image.jpg", requestFile)
+        Log.e("Enter Message","Entered the sendImage function")
 
         val apiService = ApiClient.buildService()
         compositeDisposable.add(
-            apiService.sendImage(bitmap)
+            apiService.SendImage(body)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe { response: ApiResponse ->
+                .subscribe(
+                    { response: ApiResponse ->
+                    val extractedText = response.extractedText
+                    textView.text = extractedText
+                    //  val resp = bitmap.let { ImageRequest(it) }?.let { apiService.sendImage(bitmap) }
+                }, {error: Throwable ->
+                        Log.e("SendingImageError","Error sending image: ${error.message}")
 
-                    val resp = bitmap.let { ImageRequest(it) }?.let { apiService.sendImage(bitmap) }
-                    if (resp != null) {
-
-                        val extractedText = response.extractedText
-                        Log.e("I Entered SendImage", "${extractedText.toString()}")
-                        runOnUiThread {
-                            textView.text = extractedText
-                        }
                     }
-                    else { error: Throwable ->
-                        Log.e("NewsActivity", "Error fetching news articles: ${error.message}")
-                    }
-                })
+        ))
     }
 }
